@@ -24,7 +24,10 @@ function initializeCharts() {
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: true } },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
             scales: {
                 y: { beginAtZero: false, title: { display: true, text: '°C' } },
                 x: { title: { display: true, text: 'Hora' } }
@@ -47,7 +50,10 @@ function initializeCharts() {
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: true } },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
             scales: {
                 y: { beginAtZero: false, title: { display: true, text: '%' } },
                 x: { title: { display: true, text: 'Hora' } }
@@ -70,13 +76,20 @@ function initializeCharts() {
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: true } },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
             scales: {
                 y: { beginAtZero: false, title: { display: true, text: 'Nivel' } },
                 x: { title: { display: true, text: 'Hora' } }
             }
         }
     });
+}
+
+function closeAlert() {
+    document.getElementById('alert').classList.add('hidden');
 }
 
 function updateData() {
@@ -109,6 +122,14 @@ function updateData() {
                 estadoSpan.innerText = estado;
                 estadoSpan.className = estadoClass;
 
+                if (estado === 'Malo') {
+                    document.getElementById('alert').classList.remove('hidden');
+                } else {
+                    document.getElementById('alert').classList.add('hidden');
+                }
+
+                document.getElementById('last-update').innerText = new Date(latest.created_at).toLocaleString();
+
                 const labels = feeds.map(feed => new Date(feed.created_at).toLocaleTimeString());
                 const temps = feeds.map(feed => parseFloat(feed.field1));
                 const hums = feeds.map(feed => parseFloat(feed.field2));
@@ -132,11 +153,27 @@ function updateData() {
             const estadoSpan = document.getElementById('estado');
             estadoSpan.innerText = 'Error';
             estadoSpan.className = 'desconocido';
+            document.getElementById('last-update').innerText = 'Error al cargar';
         });
 }
 
 window.onload = () => {
     initializeCharts();
     updateData();
+
+    document.getElementById('refresh-btn').addEventListener('click', updateData);
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        const icon = document.getElementById('theme-toggle').querySelector('i');
+        icon.className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+    });
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+        document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
+    }
+
     setInterval(updateData, 15000);
 };
