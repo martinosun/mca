@@ -236,6 +236,7 @@ window.onload = () => {
         document.body.classList.add('dark');
         document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
     }
+obtenerUbicacionYMostrarla();
 
     setInterval(updateData, 15000);
 };
