@@ -182,3 +182,18 @@ body.dark footer {
     .card h3 { font-size: 1rem; }
     .card p { font-size: 1.2rem; }
 }
+.ubicacion-sensor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+body.dark .ubicacion-sensor {
+    color: #ecf0f1;
+}
+.ubicacion-sensor i {
+    color: #e74c3c;
+}
