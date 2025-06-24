@@ -150,6 +150,10 @@ function updateData() {
                 humoChart.data.labels = labels;
                 humoChart.data.datasets[0].data = humos;
                 humoChart.update();
+                document.getElementById('download-report').onclick = () => {
+    descargarReporteCSV(feeds);
+};
+
             }
         })
         .catch(error => {
@@ -159,6 +163,45 @@ function updateData() {
             estadoSpan.className = 'desconocido';
             document.getElementById('last-update').innerText = 'Error al cargar';
         });
+}
+function descargarReporteCSV(feeds) {
+    const encabezado = ['Fecha y Hora', 'Temperatura (°C)', 'Humedad (%)', 'Humo'];
+    const filas = feeds.map(feed => [
+        new Date(feed.created_at).toLocaleString(),
+        parseFloat(feed.field1) || 0,
+        parseFloat(feed.field2) || 0,
+        parseFloat(feed.field3) || 0
+    ]);
+
+    const csvContent = [encabezado, ...filas]
+        .map(e => e.join(','))
+        .join('\n');
+
+}
+function descargarReporteCSV(feeds) {
+    const ahora = new Date();
+    const fechaArchivo = ahora.toISOString().slice(0, 16).replace(/[:T]/g, '-');
+    const nombreArchivo = `reporte_calidad_aire_${fechaArchivo}.csv`;
+
+    const encabezado = ['Fecha y Hora', 'Temperatura (°C)', 'Humedad (%)', 'Humo'];
+    const filas = feeds.map(feed => [
+        new Date(feed.created_at).toLocaleString(),
+        feed.field1 ? parseFloat(feed.field1).toFixed(2) : 'N/A',
+        feed.field2 ? parseFloat(feed.field2).toFixed(2) : 'N/A',
+        feed.field3 ? parseFloat(feed.field3).toFixed(2) : 'N/A'
+    ]);
+
+    const contenidoCSV = [encabezado, ...filas]
+        .map(fila => fila.join(','))
+        .join('\n');
+
+    const blob = new Blob([contenidoCSV], { type: 'text/csv;charset=utf-8;' });
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(blob);
+    enlace.setAttribute('download', nombreArchivo);
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
 }
 
 window.onload = () => {
