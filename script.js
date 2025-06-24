@@ -203,6 +203,21 @@ function descargarReporteCSV(feeds) {
     enlace.click();
     document.body.removeChild(enlace);
 }
+function obtenerUbicacionYMostrarla() {
+    const lugar = document.getElementById('ubicacion-sensor');
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const lat = pos.coords.latitude.toFixed(5);
+            const lon = pos.coords.longitude.toFixed(5);
+            lugar.innerHTML = `<i class="fas fa-map-marker-alt"></i> Ubicación aproximada: <strong>${lat}, ${lon}</strong>`;
+        }, err => {
+            lugar.textContent = 'No se pudo obtener la ubicación.';
+            console.warn('Error de geolocalización:', err);
+        });
+    } else {
+        lugar.textContent = 'Geolocalización no soportada por este navegador.';
+    }
+}
 
 window.onload = () => {
     initializeCharts();
