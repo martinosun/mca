@@ -1,5 +1,5 @@
 const channelId = '2993001';
-const readApiKey = 'AD2VIFIDGRAD1RI6';
+const readApiKey = 'QKA7CTLL8KP27QBU';
 const results = 10;
 
 let tempChart, humChart, humoChart;
@@ -93,31 +93,35 @@ function closeAlert() {
 }
 
 function updateData() {
-    fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${readApiKey}&results=${results}`)
+    fetch(`https://api.thingspeak.com/channels/2993001/feeds.json?api_key=QKA7CTLL8KP27QBU&results=10`)
         .then(response => response.json())
         .then(data => {
             const feeds = data.feeds;
             if (feeds.length > 0) {
-                const latest = feeds[feeds.length - 1];
-                document.getElementById('temp').innerText = parseFloat(latest.field1).toFixed(2);
-                document.getElementById('hum').innerText = parseFloat(latest.field2).toFixed(2);
-                document.getElementById('humo').innerText = parseFloat(latest.field3).toFixed(2);
+                const latest = feeds[feeds.length - 1] || {};
 
-                const humo = parseFloat(latest.field3);
-                const temp = parseFloat(latest.field1);
-                const hum = parseFloat(latest.field2);
+                const temperatura = parseFloat(latest.field1) || 0;
+                const humedad = parseFloat(latest.field2) || 0;
+                const humo = parseFloat(latest.field3) || 0;
+
+                document.getElementById('temp').innerText = temperatura.toFixed(2);
+                document.getElementById('hum').innerText = humedad.toFixed(2);
+                document.getElementById('humo').innerText = humo.toFixed(2);
+
                 let estado = 'Desconocido';
                 let estadoClass = 'desconocido';
-                if (humo < 150 && temp >= 22 && temp <= 28 && hum >= 40 && hum <= 70) {
+
+                if (humo < 150 && temperatura >= 22 && temperatura <= 28 && humedad >= 40 && humedad <= 70) {
                     estado = 'Bueno';
                     estadoClass = 'bueno';
-                } else if (humo >= 150 && humo < 250 && temp >= 20 && temp <= 30 && hum >= 30 && hum <= 80) {
+                } else if (humo >= 150 && humo < 250 && temperatura >= 20 && temperatura <= 30 && humedad >= 30 && humedad <= 80) {
                     estado = 'Moderado';
                     estadoClass = 'moderado';
                 } else {
                     estado = 'Malo';
                     estadoClass = 'malo';
                 }
+
                 const estadoSpan = document.getElementById('estado');
                 estadoSpan.innerText = estado;
                 estadoSpan.className = estadoClass;
@@ -131,9 +135,9 @@ function updateData() {
                 document.getElementById('last-update').innerText = new Date(latest.created_at).toLocaleString();
 
                 const labels = feeds.map(feed => new Date(feed.created_at).toLocaleTimeString());
-                const temps = feeds.map(feed => parseFloat(feed.field1));
-                const hums = feeds.map(feed => parseFloat(feed.field2));
-                const humos = feeds.map(feed => parseFloat(feed.field3));
+                const temps = feeds.map(feed => parseFloat(feed.field1) || 0);
+                const hums = feeds.map(feed => parseFloat(feed.field2) || 0);
+                const humos = feeds.map(feed => parseFloat(feed.field3) || 0);
 
                 tempChart.data.labels = labels;
                 tempChart.data.datasets[0].data = temps;
